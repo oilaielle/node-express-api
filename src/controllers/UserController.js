@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const UserResponse = require("../responses/UserResponse");
 
 exports.register = (req, res, next) => {
   User.findOne({ email: req.body.email }).then(user => {
@@ -51,9 +52,9 @@ exports.login = (req, res, next) => {
         const payload = { id: user.id, name: user.name, avatar: user.avatar };
         jwt.sign(
           payload,
-          process.env.SECRET_KEY,
+          process.env.SECRET_OR_KEY,
           {
-            expiresIn: process.env.EXPIRES_IN
+            expiresIn: parseInt(process.env.EXPIRES_IN)
           },
           (err, token) => {
             res.json({
@@ -68,4 +69,8 @@ exports.login = (req, res, next) => {
       }
     });
   });
+};
+
+exports.current = (req, res, next) => {
+  res.json(UserResponse.one(req.user));
 };
