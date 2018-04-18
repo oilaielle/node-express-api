@@ -10,13 +10,14 @@ exports.register = (req, res, next) => {
   const { errors, isValid } = validateRegisterInput(req.body);
 
   if (!isValid) {
-    next({ status: 422, message: errors.name });
+    next({ status: 422, message: errors });
     return;
   }
 
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      next({ status: 422, message: "Email already exsits" });
+      errors.email = "Email already exsits";
+      next({ status: 422, message: errors });
       return;
     } else {
       const avatar = gravatar.url(req.body.email, {
@@ -51,6 +52,7 @@ exports.login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email }).then(user => {
     if (!user) {
+      // errors.email = "User email not found";
       next({ status: 422, message: "User email not found" });
       return;
     }
