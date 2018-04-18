@@ -4,8 +4,16 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 const UserResponse = require("../responses/UserResponse");
+const validateRegisterInput = require("../validations/users/register");
 
 exports.register = (req, res, next) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+
+  if (!isValid) {
+    next({ status: 422, message: errors.name });
+    return;
+  }
+
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       next({ status: 422, message: "Email already exsits" });
@@ -31,7 +39,7 @@ exports.register = (req, res, next) => {
           newUser.password = hash;
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => res.json(UserResponse.one(user)))
             .catch(err => next(err));
         });
       });
