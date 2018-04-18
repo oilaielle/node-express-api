@@ -9,4 +9,10 @@ router.get(
   ProfileController.get
 );
 
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.create
+);
+
 module.exports = router;
