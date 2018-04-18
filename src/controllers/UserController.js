@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const UserResponse = require("../responses/UserResponse");
 const validateRegisterInput = require("../validations/users/register");
+const validateLoginInput = require("../validations/users/login");
 
 exports.register = (req, res, next) => {
   const { errors, isValid } = validateRegisterInput(req.body);
@@ -49,11 +50,19 @@ exports.register = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  if (!isValid) {
+    next({ status: 422, message: errors });
+    return;
+  }
+
   const { email, password } = req.body;
+
   User.findOne({ email }).then(user => {
     if (!user) {
-      // errors.email = "User email not found";
-      next({ status: 422, message: "User email not found" });
+      errors.email = "User email not found";
+      next({ status: 422, message: errors });
       return;
     }
 
@@ -74,7 +83,8 @@ exports.login = (req, res, next) => {
           }
         );
       } else {
-        next({ status: 422, message: "Password incorrect" });
+        errors.password = "Password incorrect";
+        next({ status: 422, message: errors });
         return;
       }
     });
