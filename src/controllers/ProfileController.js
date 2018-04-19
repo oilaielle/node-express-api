@@ -5,9 +5,10 @@ exports.get = (req, res, next) => {
   const errors = {};
 
   Profile.findOne({ user: req.user.id })
+    .populate("user", ["name", "avatar"])
     .then(profile => {
       if (!profile) {
-        errors.noprofile = "There is no profile for this user";
+        errors.profile = "There is no profile for this user";
         next({ status: 422, message: errors });
         return;
       }
@@ -109,4 +110,38 @@ exports.create = (req, res, next) => {
       }
     })
     .catch(err => next(err));
+};
+
+exports.getHandleById = (req, res, next) => {
+  const errors = {};
+  Profile.findOne({ handle: req.params.handle })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.profile = "There is no profile for this user";
+        next({ status: 422, message: errors });
+        return;
+      }
+      res.json(profile);
+    })
+    .catch(err => next(err));
+};
+
+exports.getUserByUserId = (req, res, next) => {
+  const errors = {};
+  Profile.findOne({ user: req.params.userId })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.profile = "There is no profile for this user";
+        next({ status: 422, message: errors });
+        return;
+      }
+      res.json(profile);
+    })
+    .catch(err => {
+      errors.profile = "There is no profile for this user";
+      next({ status: 422, message: errors });
+      return;
+    });
 };

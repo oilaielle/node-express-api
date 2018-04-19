@@ -15,4 +15,16 @@ router.post(
   ProfileController.create
 );
 
+router.get(
+  "/handle/:handle",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.getHandleById
+);
+
+router.get(
+  "/user/:userId",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.getUserByUserId
+);
+
 module.exports = router;
