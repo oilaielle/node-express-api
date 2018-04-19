@@ -41,4 +41,22 @@ router.post(
   ProfileController.createEducation
 );
 
+router.delete(
+  "/experience/:expId",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.deleteExperience
+);
+
+router.delete(
+  "/education/:eduId",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.deleteEducation
+);
+
+router.delete(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.deleteProfile
+);
+
 module.exports = router;

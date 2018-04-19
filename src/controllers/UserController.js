@@ -77,7 +77,7 @@ exports.login = (req, res, next) => {
           },
           (err, token) => {
             res.json({
-              message: "Success",
+              success: true,
               token: `Bearer ${token}`
             });
           }
