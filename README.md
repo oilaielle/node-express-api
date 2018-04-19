@@ -3,7 +3,7 @@
 ## Setup
 
 ```bash
-$ git clone git@github.com:yuttasakcom/mern-stack.git && cd mern-stack
+$ git clone git@github.com:yuttasakcom/node-express-api.git && cd node-express-api
 $ yarn install
 ```
 
