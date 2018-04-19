@@ -1,4 +1,4 @@
-# MERN Stack
+# Node Express Api
 
 ## Setup
 
