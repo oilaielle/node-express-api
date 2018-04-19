@@ -39,4 +39,16 @@ router.delete(
   PostController.unlike
 );
 
+router.post(
+  "/:id/comment",
+  passport.authenticate("jwt", { session: false }),
+  PostController.createComment
+);
+
+router.delete(
+  "/:id/comment/:commentId",
+  passport.authenticate("jwt", { session: false }),
+  PostController.deleteComment
+);
+
 module.exports = router;

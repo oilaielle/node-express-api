@@ -35,7 +35,7 @@ exports.getById = (req, res, next) => {
   let errors = {};
 
   Post.findById(req.params.id)
-    .then(posts => res.json(posts))
+    .then(post => res.json(post))
     .catch(err => {
       errors.post = "No post found with that ID";
       next({ status: 422, message: errors });
@@ -130,4 +130,64 @@ exports.unlike = (req, res, next) => {
         });
     })
     .catch(err => next(err));
+};
+
+exports.createComment = (req, res, next) => {
+  const { errors, isValid } = validatePostInput(req.body);
+
+  if (!isValid) {
+    next({ status: 422, message: errors });
+    return;
+  }
+
+  Post.findById(req.params.id)
+    .then(post => {
+      const newComment = {
+        text: req.body.text,
+        name: req.body.name,
+        avatar: req.body.avatar,
+        user: req.user.id
+      };
+
+      post.comments.unshift(newComment);
+      post
+        .save()
+        .then(p => res.json(p))
+        .catch(err => next(err));
+    })
+    .catch(err => {
+      errors.post = "No post found";
+      next({ status: 404, message: errors });
+    });
+};
+
+exports.deleteComment = (req, res, next) => {
+  let errors = {};
+
+  Post.findById(req.params.id)
+    .then(post => {
+      if (
+        post.comments.filter(
+          comment => comment._id.toString() === req.params.commentId
+        ).length === 0
+      ) {
+        errors.comment = "Comment does not exist";
+        next({ status: 422, errors });
+        return;
+      }
+
+      const removeIndex = post.comments
+        .map(comment => comment._id.toString)
+        .indexOf(req.params.commentId);
+
+      post.comments.splice(removeIndex, 1);
+      post
+        .save()
+        .then(p => res.json(p))
+        .catch(err => next(err));
+    })
+    .catch(err => {
+      errors.post = "No post found";
+      next({ status: 404, message: errors });
+    });
 };
