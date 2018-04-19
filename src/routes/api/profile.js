@@ -27,4 +27,18 @@ router.get(
   ProfileController.getUserByUserId
 );
 
+router.get("/all", ProfileController.all);
+
+router.post(
+  "/experience",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.createExperience
+);
+
+router.post(
+  "/education",
+  passport.authenticate("jwt", { session: false }),
+  ProfileController.createEducation
+);
+
 module.exports = router;

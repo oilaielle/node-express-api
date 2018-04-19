@@ -1,5 +1,7 @@
 const Profile = require("../models/Profile");
 const validateProfileInput = require("../validations/profiles/profile");
+const validateExperienceInput = require("../validations/profiles/experience");
+const validateEducationceInput = require("../validations/profiles/education");
 
 exports.get = (req, res, next) => {
   const errors = {};
@@ -144,4 +146,77 @@ exports.getUserByUserId = (req, res, next) => {
       next({ status: 422, message: errors });
       return;
     });
+};
+
+exports.all = (req, res, next) => {
+  const errors = {};
+
+  Profile.find()
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.profile = "There are no profiles";
+        next({ status: 422, message: errors });
+        return;
+      }
+
+      res.json(profile);
+    })
+    .catch(err => {
+      errors.profile = "There are no profiles";
+      next({ status: 422, message: errors });
+      return;
+    });
+};
+
+exports.createExperience = (req, res, next) => {
+  const { errors, isValid } = validateExperienceInput(req.body);
+
+  if (!isValid) {
+    next({ status: 422, message: errors });
+    return;
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      const nexExp = {
+        title: req.body.title,
+        company: req.body.company,
+        location: req.body.location,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      };
+
+      profile.experience.unshift(nexExp);
+      profile.save().then(p => res.json(p));
+    })
+    .catch(err => next(err));
+};
+
+exports.createEducation = (req, res, next) => {
+  const { errors, isValid } = validateEducationceInput(req.body);
+
+  if (!isValid) {
+    next({ status: 422, message: errors });
+    return;
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      const nexEdu = {
+        school: req.body.school,
+        degree: req.body.degree,
+        fieldofstudy: req.body.fieldofstudy,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      };
+
+      profile.education.unshift(nexEdu);
+      profile.save().then(p => res.json(p));
+    })
+    .catch(err => next(err));
 };
